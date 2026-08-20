@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+
+<g fill="none" stroke="#1F6F43" stroke-width="42" stroke-linecap="square" stroke-linejoin="miter">
+  <!-- corner brackets -->
+  <path d="M150 275 V150 H275"/>
+  <path d="M725 150 H850 V275"/>
+  <path d="M150 725 V850 H275"/>
+  <path d="M725 850 H850 V725"/>
+  <!-- segmented focus ring -->
+  <path d="M300 213 A330 330 0 0 1 462 171"/>
+  <path d="M538 171 A330 330 0 0 1 700 213"/>
+  <path d="M787 300 A330 330 0 0 1 829 462"/>
+  <path d="M829 538 A330 330 0 0 1 787 700"/>
+  <path d="M700 787 A330 330 0 0 1 538 829"/>
+  <path d="M462 829 A330 330 0 0 1 300 787"/>
+  <path d="M213 700 A330 330 0 0 1 171 538"/>
+  <path d="M171 462 A330 330 0 0 1 213 300"/>
+  <!-- cardinal ticks -->
+  <path d="M500 110 V235"/>
+  <path d="M500 765 V890"/>
+  <path d="M110 500 H235"/>
+  <path d="M765 500 H890"/>
+  <!-- home -->
+  <path d="M315 530 L500 360 L685 530"/>
+  <path d="M350 500 V745 H650 V500"/>
+  <path d="M535 398 V470 H620"/>
+  <path d="M465 745 V610 H560 V745"/>
+</g>
+<!-- window panes -->
+<g fill="#1F6F43">
+  <rect x="455" y="500" width="34" height="34"/>
+  <rect x="506" y="500" width="34" height="34"/>
+  <rect x="455" y="551" width="34" height="34"/>
+  <rect x="506" y="551" width="34" height="34"/>
+</g>
+</svg>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HomeOps · A2 — PWA Landing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #005B5D;
+    --green-hover: #004749;
+    --white: #FFFFFF;
+    --gray-light: #F0F0F0;
+    --gray-mid: #8A8F8A;
+    --ink: #1A1F1A;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #E3E6E3;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px;
+  }
+  .phone {
+    width: 375px; height: 812px;
+    background: var(--white);
+    border-radius: 44px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 0 0 10px #1A1F1A;
+    overflow: hidden;
+    position: relative;
+    display: flex; flex-direction: column;
+  }
+  .statusbar {
+    height: 44px; flex: 0 0 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; font-size: 13px; font-weight: 600; color: var(--ink);
+  }
+  .notch {
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 140px; height: 28px; background: #1A1F1A; border-radius: 18px;
+  }
+  .screen { flex: 1; display: flex; flex-direction: column; padding: 24px 20px 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .mark {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--green); position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mark::before {
+    content: ""; width: 12px; height: 12px; background: var(--white);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    transform: translateY(-3px);
+  }
+  .mark::after {
+    content: ""; position: absolute; bottom: 7px; width: 18px; height: 9px;
+    background: var(--white); border-radius: 0 0 3px 3px;
+  }
+  .brand-name { font-size: 14px; font-weight: 700; letter-spacing: 1.5px; color: var(--green); }
+  .brand-sub { font-size: 11px; color: var(--gray-mid); letter-spacing: 0.4px; }
+  .hero { margin-top: 36px; }
+  .hero h1 { font-size: 28px; line-height: 34px; font-weight: 700; color: var(--ink); }
+  .hero p { margin-top: 12px; font-size: 16px; line-height: 24px; color: #4A514A; }
+  .data-card {
+    margin-top: 32px;
+    padding: 16px;
+    background: var(--gray-light);
+    border-radius: 8px;
+    /* corner brackets via gradients */
+    --c: var(--green);
+    background-image:
+      linear-gradient(var(--c),var(--c)) top left / 12px 2px,
+      linear-gradient(var(--c),var(--c)) top left / 2px 12px,
+      linear-gradient(var(--c),var(--c)) top right / 12px 2px,
+      linear-gradient(var(--c),var(--c)) top right / 2px 12px,
+      linear-gradient(var(--c),var(--c)) bottom left / 12px 2px,
+      linear-gradient(var(--c),var(--c)) bottom left / 2px 12px,
+      linear-gradient(var(--c),var(--c)) bottom right / 12px 2px,
+      linear-gradient(var(--c),var(--c)) bottom right / 2px 12px;
+    background-repeat: no-repeat;
+  }
+  .data-card .label { font-size: 12px; font-weight: 600; letter-spacing: 0.6px; color: var(--green); text-transform: uppercase; }
+  .data-card .body { margin-top: 6px; font-size: 14px; line-height: 21px; color: #4A514A; }
+  .spacer { flex: 1; }
+  .cta {
+    display: flex; align-items: center; justify-content: center;
+    height: 52px; border-radius: 8px; background: var(--green);
+    color: var(--white); font-size: 16px; font-weight: 600; text-decoration: none;
+    box-shadow: 0 6px 16px rgba(0,91,93,0.28);
+  }
+  .cta:hover { background: var(--green-hover); }
+  .cta:focus-visible { outline: 2px solid var(--white); outline-offset: 2px; box-shadow: 0 0 0 4px var(--green); }
+  .footnote { margin-top: 14px; text-align: center; font-size: 12px; color: var(--gray-mid); }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span>9:41</span>
+      <span>📶 🔋</span>
+    </div>
+    <div class="screen">
+      <div class="brand">
+        <div class="mark"></div>
+        <div>
+          <div class="brand-name">HOMEOPS</div>
+          <div class="brand-sub">Diagnostic Assistant</div>
+        </div>
+      </div>
+
+      <div class="hero">
+        <h1>Your property manager started a check for Unit 4B.</h1>
+        <p>We'll walk you through it, one safe step at a time.</p>
+      </div>
+
+      <div class="data-card">
+        <div class="label">On-device data</div>
+        <div class="body">Your data stays on this phone unless you approve sharing. No account. No download.</div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <a class="cta" href="#">Take Command: Start the check →</a>
+      <div class="footnote">No account · No download · ~1 min</div>
+    </div>
+  </div>
+</body>
+</html>

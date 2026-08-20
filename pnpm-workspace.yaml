@@ -1,6 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "services/*"
 allowBuilds:
+  bun: true
+  detox: true
+  dtrace-provider: true
   sharp: true
   unrs-resolver: true
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver

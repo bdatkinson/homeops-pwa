@@ -1,34 +1,28 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@homeops/shared": ["./packages/shared/src"],
+      "@homeops/shared/*": ["./packages/shared/src/*"],
+      "@homeops/supabase": ["./packages/supabase/src"],
+      "@homeops/supabase/*": ["./packages/supabase/src/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-  ],
-  "exclude": ["node_modules"]
+  "references": [
+    {
+      "path": "./packages/shared"
+    },
+    {
+      "path": "./packages/supabase"
+    },
+    {
+      "path": "./services/gateway"
+    },
+    {
+      "path": "./apps/mobile"
+    },
+    {
+      "path": "./apps/web"
+    }
+  ]
 }

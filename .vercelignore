@@ -1,0 +1,9 @@
+/apps/mobile/
+/services/
+/supabase/
+/.git/
+/node_modules/
+/.turbo/
+**/node_modules/
+**/.turbo/
+

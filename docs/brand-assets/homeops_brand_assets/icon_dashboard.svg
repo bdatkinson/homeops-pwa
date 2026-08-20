@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+<g fill="none" stroke="#1F6F43" stroke-width="35" stroke-linecap="round" stroke-linejoin="round" color="#1F6F43">
+<path d="M200 310 V200 H310 M690 200 H800 V310 M200 690 V800 H310 M690 800 H800 V690"/>
+<circle cx="500" cy="500" r="245" stroke-dasharray="140 55"/>
+<path d="M355 555 L500 420 L645 555"/><path d="M390 530 V690 H610 V530"/><path d="M470 690 V600 H535 V690"/>
+</g></svg>

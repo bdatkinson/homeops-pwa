@@ -1,0 +1,143 @@
+table_name,column_name,data_type,is_nullable
+appliances,id,uuid,NO
+appliances,property_id,uuid,NO
+appliances,appliance_type,text,NO
+appliances,make,text,NO
+appliances,model,text,NO
+appliances,model_normalized,text,YES
+appliances,serial,text,YES
+appliances,estimated_year,integer,YES
+appliances,corpus_document_id,uuid,YES
+appliances,registration_method,USER-DEFINED,NO
+appliances,ocr_raw_text,text,YES
+appliances,ocr_confidence,numeric,YES
+appliances,photo_urls,ARRAY,YES
+appliances,recall_status,text,YES
+appliances,cpsc_recall_ids,ARRAY,YES
+appliances,recall_checked_at,timestamp with time zone,YES
+appliances,warranty_expires_at,date,YES
+appliances,warranty_doc_url,text,YES
+appliances,notes,text,YES
+appliances,created_at,timestamp with time zone,NO
+appliances,updated_at,timestamp with time zone,NO
+corpus_chunks,id,uuid,NO
+corpus_chunks,doc_id,uuid,NO
+corpus_chunks,chunk_index,integer,NO
+corpus_chunks,content,text,NO
+corpus_chunks,chunk_type,text,NO
+corpus_chunks,section,text,YES
+corpus_chunks,section_path,text,YES
+corpus_chunks,page_ref,integer,YES
+corpus_chunks,embedding,USER-DEFINED,YES
+corpus_chunks,make,text,NO
+corpus_chunks,model_canonical,text,NO
+corpus_chunks,appliance_type,text,NO
+corpus_chunks,metadata,jsonb,YES
+corpus_chunks,created_at,timestamp with time zone,NO
+corpus_documents,id,uuid,NO
+corpus_documents,make,text,NO
+corpus_documents,model_canonical,text,NO
+corpus_documents,model_variants,ARRAY,YES
+corpus_documents,appliance_type,text,NO
+corpus_documents,doc_type,text,NO
+corpus_documents,year_start,integer,YES
+corpus_documents,year_end,integer,YES
+corpus_documents,source_url,text,YES
+corpus_documents,source_slug,text,YES
+corpus_documents,license,text,NO
+corpus_documents,coverage_depth,text,NO
+corpus_documents,raw_file_path,text,YES
+corpus_documents,page_count,integer,YES
+corpus_documents,quality_score,integer,YES
+corpus_documents,ingestion_date,timestamp with time zone,NO
+corpus_documents,created_at,timestamp with time zone,NO
+diagnostic_sessions,id,uuid,NO
+diagnostic_sessions,appliance_id,uuid,NO
+diagnostic_sessions,user_id,uuid,NO
+diagnostic_sessions,input_type,USER-DEFINED,NO
+diagnostic_sessions,user_input_text,text,YES
+diagnostic_sessions,audio_duration_s,integer,YES
+diagnostic_sessions,status,USER-DEFINED,NO
+diagnostic_sessions,corpus_chunks_used,ARRAY,YES
+diagnostic_sessions,retrieval_score,numeric,YES
+diagnostic_sessions,likely_issue,text,YES
+diagnostic_sessions,confidence,numeric,NO
+diagnostic_sessions,safe_steps,jsonb,YES
+diagnostic_sessions,safety_flag,text,YES
+diagnostic_sessions,stop_here,boolean,NO
+diagnostic_sessions,source_citations,jsonb,YES
+diagnostic_sessions,raw_llm_response,jsonb,YES
+diagnostic_sessions,outcome,text,YES
+diagnostic_sessions,outcome_recorded_at,timestamp with time zone,YES
+diagnostic_sessions,followup_sent_at,timestamp with time zone,YES
+diagnostic_sessions,report_pdf_url,text,YES
+diagnostic_sessions,started_at,timestamp with time zone,NO
+diagnostic_sessions,completed_at,timestamp with time zone,YES
+diagnostic_sessions,created_at,timestamp with time zone,NO
+model_registry,id,uuid,NO
+model_registry,model_number,text,NO
+model_registry,model_normalized,text,NO
+model_registry,make,text,NO
+model_registry,brand,text,YES
+model_registry,appliance_type,text,YES
+model_registry,year_introduced,integer,YES
+model_registry,year_discontinued,integer,YES
+model_registry,corpus_document_id,uuid,YES
+model_registry,cpsc_recall_ids,ARRAY,YES
+model_registry,energystar_certified,boolean,YES
+model_registry,created_at,timestamp with time zone,NO
+passport_appliances,passport_id,uuid,NO
+passport_appliances,appliance_id,uuid,NO
+passport_invites,id,uuid,NO
+passport_invites,passport_id,uuid,NO
+passport_invites,token,uuid,NO
+passport_invites,channel,USER-DEFINED,NO
+passport_invites,recipient_phone,text,YES
+passport_invites,recipient_email,text,YES
+passport_invites,delivery_status,USER-DEFINED,NO
+passport_invites,twilio_message_sid,text,YES
+passport_invites,resend_message_id,text,YES
+passport_invites,delivered_at,timestamp with time zone,YES
+passport_invites,opened_at,timestamp with time zone,YES
+passport_invites,claimed_by,uuid,YES
+passport_invites,activated_at,timestamp with time zone,YES
+passport_invites,expires_at,timestamp with time zone,NO
+passport_invites,created_at,timestamp with time zone,NO
+passports,id,uuid,NO
+passports,property_id,uuid,NO
+passports,created_by,uuid,NO
+passports,status,USER-DEFINED,NO
+passports,activated_at,timestamp with time zone,YES
+passports,brand_agent_name,text,YES
+passports,brand_brokerage,text,YES
+passports,brand_photo_url,text,YES
+passports,brand_contact_email,text,YES
+passports,brand_contact_phone,text,YES
+passports,appliance_count,integer,NO
+passports,created_at,timestamp with time zone,NO
+passports,updated_at,timestamp with time zone,NO
+profiles,id,uuid,NO
+profiles,role,text,NO
+profiles,full_name,text,YES
+profiles,phone,text,YES
+profiles,brokerage_name,text,YES
+profiles,license_number,text,YES
+profiles,agent_photo_url,text,YES
+profiles,subscription_status,text,YES
+profiles,subscription_expires_at,timestamp with time zone,YES
+profiles,onboarded_via,text,YES
+profiles,created_at,timestamp with time zone,NO
+profiles,updated_at,timestamp with time zone,NO
+properties,id,uuid,NO
+properties,created_by,uuid,NO
+properties,address_line1,text,NO
+properties,address_line2,text,YES
+properties,city,text,NO
+properties,state,character,NO
+properties,zip,text,NO
+properties,country,character,NO
+properties,latitude,numeric,YES
+properties,longitude,numeric,YES
+properties,google_place_id,text,YES
+properties,created_at,timestamp with time zone,NO
+properties,updated_at,timestamp with time zone,NO

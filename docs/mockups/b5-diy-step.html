@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HomeOps · B5 — DIY Deflection Step</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #005B5D; --green-hover: #004749; --white: #FFFFFF;
+    --gray-light: #F0F0F0; --gray-mid: #8A8F8A; --ink: #1A1F1A; --amber: #B45309;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #E3E6E3; display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px;
+  }
+  .phone {
+    width: 375px; height: 812px; background: var(--white); border-radius: 44px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 0 0 10px #1A1F1A;
+    overflow: hidden; position: relative; display: flex; flex-direction: column;
+  }
+  .statusbar { height: 44px; flex: 0 0 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .notch { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 140px; height: 28px; background: #1A1F1A; border-radius: 18px; }
+  .header { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; padding: 12px 20px 12px; border-bottom: 1px solid var(--gray-light); }
+  .back { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--gray-light); background: var(--white); color: var(--green); font-size: 16px; cursor: pointer; }
+  .header-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .screen { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
+  .progress-row { display: flex; align-items: center; gap: 10px; }
+  .progress { flex: 1; height: 6px; border-radius: 3px; background: var(--gray-light); overflow: hidden; }
+  .progress-fill { width: 50%; height: 100%; background: var(--green); border-radius: 3px; }
+  .progress-label { font-size: 12px; font-weight: 600; color: var(--green); }
+  h1 { margin-top: 18px; font-size: 22px; line-height: 28px; font-weight: 700; color: var(--ink); }
+  .media {
+    margin-top: 16px; height: 160px; border-radius: 8px; background: var(--gray-light);
+    display: flex; align-items: center; justify-content: center; color: var(--gray-mid);
+    font-size: 13px; font-weight: 500;
+  }
+  .steps { margin-top: 18px; list-style: none; counter-reset: step; }
+  .steps li {
+    counter-increment: step; position: relative; padding-left: 34px; margin-bottom: 14px;
+    font-size: 15px; line-height: 22px; color: #4A514A;
+  }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 0;
+    width: 24px; height: 24px; border-radius: 50%; background: var(--green); color: var(--white);
+    font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+  .badge { margin-top: 4px; display: inline-block; font-size: 11px; font-weight: 600; color: var(--green); background: #E6F0F0; padding: 4px 10px; border-radius: 20px; }
+  .spacer { flex: 1; }
+  .cta {
+    display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 8px;
+    background: var(--green); color: var(--white); font-size: 16px; font-weight: 600; cursor: pointer;
+    border: none; font-family: inherit; width: 100%; box-shadow: 0 6px 16px rgba(0,91,93,0.28);
+  }
+  .cta:hover { background: var(--green-hover); }
+  .cta:focus-visible { outline: 2px solid var(--white); outline-offset: 2px; box-shadow: 0 0 0 4px var(--green); }
+  .ghost {
+    width: 100%; height: 48px; margin-top: 10px; border-radius: 8px; border: 1px solid var(--green);
+    background: var(--white); color: var(--green); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .ghost:hover { background: var(--gray-light); }
+  .ghost:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="header">
+      <button class="back" aria-label="Go back">←</button>
+      <div class="header-title">Clear the filter</div>
+    </div>
+
+    <div class="screen">
+      <div class="progress-row">
+        <span class="progress-label">Step 2 of 4</span>
+        <div class="progress"><div class="progress-fill"></div></div>
+      </div>
+
+      <h1>Clear the drain filter</h1>
+
+      <div class="media">Illustration / short clip</div>
+
+      <ol class="steps">
+        <li>Place a shallow tray below the lower-front access door.</li>
+        <li>Twist the filter cap counter-clockwise and pull it out.</li>
+        <li>Remove any debris, then reinstall and twist clockwise to lock.</li>
+      </ol>
+
+      <div><span class="badge">Level 1 · no tools · no disassembly</span></div>
+
+      <div class="spacer"></div>
+
+      <button class="cta">Done — next step</button>
+      <button class="ghost">I need help</button>
+    </div>
+  </div>
+</body>
+</html>
