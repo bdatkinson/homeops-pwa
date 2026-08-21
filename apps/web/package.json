@@ -10,11 +10,12 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "16.2.10",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "@homeops/supabase": "workspace:*",
     "@homeops/ui": "workspace:*",
-    "@homeops/supabase": "workspace:*"
+    "next": "16.2.10",
+    "posthog-js": "^1.418.5",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

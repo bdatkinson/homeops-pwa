@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import ConsentBootstrap from "../components/ConsentBootstrap";
 
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-mono",
@@ -28,6 +29,7 @@ export default function RootLayout({
         }}
       >
         {children}
+        <ConsentBootstrap />
       </body>
     </html>
   );
