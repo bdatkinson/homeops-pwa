@@ -10,7 +10,7 @@
 
 A HomeOps user scans the 3–4 appliances in their home (washer, dryer, fridge, dishwasher). The system knows exactly which models they own and serves diagnostics ONLY for those models. Personalization = **per-model diagnostic packs** (facts) + optional **brand/family LoRA adapter** (behavior), downloaded to the device. The model never recalls error codes — it executes retrieved ones.
 
-**Spike-verified numbers (2026-08-16, real manuals):** 3-appliance fleet ≈ 14.4 KB raw / 4.7 KB gzip / ~3,700 tokens. Retrieval is effectively free (exact-match 0.07 µs; SQLite FTS5 4.2 µs). Diagnostic-worthy content is only 1.5–6.7% of manual text — the pack is ~1000× smaller than the PDF.
+**Spike-verified numbers (2026-08-16, real manuals):** 3-appliance fleet ≈ 14.4 KB raw / 4.7 KB gzip / ~3,700 tokens. Retrieval is effectively free (in-browser exact-match + SQLite FTS5; exact latencies TBD via benchmark harness). Diagnostic-worthy content is only 1.5–6.7% of manual text — the pack is ~1000× smaller than the PDF.
 
 ---
 

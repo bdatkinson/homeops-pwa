@@ -30,7 +30,7 @@ hermes-description: Year 1 SMS PWA + PM dashboard — product spine, UX walkthro
 
 **The three blockers that stop the build (all documented as Open Questions):**
 1. **OQ-01 · Property Meld webhook/API** — no sandbox = no A1 = no funnel. Single highest-priority unblock.
-2. **OQ-07 · FTFR baseline ledger** — the 40–50% / 50–60% / 85–95% inconsistency must be resolved before any case study or external number ships.
+2. **OQ-07 · FTFR baseline ledger — RESOLVED 2026-08-21** — industry avg 75–80% (Aberdeen 2013/PTC 2024/IBM 2026); appliance-specific 68–74% (Exoserva 2026); broken/laggard band 60–65% (UASA). "40% NTF" disproven (imported avionics; honest appliance NTF ~15–25%). Use `homeops-ftfr-deep-dossier-2026-08-21.md` + `homeops-ntf-deep-provenance-dossier-2026-08-21.md` for case-study baselines.
 3. **OQ-09 · C3 disclosure legal wording** — Trust Constitution #3 requires counsel-approved compensation disclosure before C4 can ship.
 
 Full open-question list: §7 of the Product Spine (Part 1) — OQ-01 through OQ-12.
@@ -109,7 +109,7 @@ HomeOps Year 1 is a **B2B2C wedge**: a zero-install, SMS-triggered Progressive W
 
 The previous React Native/Expo direction is **archived**. No React Native, no Expo, no app store, no ML Kit (ML Kit is an Android/iOS SDK, **not a browser API**). The browser surface is:
 
-- WASM SQLite in-browser (exact-match error-code lookup `0.07 µs`, FTS5 `4.2 µs` `[MEASUREMENT — benchmark harness with device/dataset/warm-cold/p50-p95-p99 required]`).
+- WASM SQLite in-browser (offline-first exact-match + FTS5 error-code lookup; performance to be measured — `[MEASUREMENT — benchmark harness with device/dataset/warm-cold/p50-p95-p99 required]`).
 - `<input capture="environment">` for camera OCR of model plates — **capability-detected**, not a universal dependency.
 - `webkitSpeechRecognition` for voice — **capability-detected**, sub-200 ms is an aspiration `[HYPOTHESIS]`, not a contract.
 - Offline-first: triage works in a basement/utility room with no connectivity; telemetry syncs on consent.
@@ -246,7 +246,7 @@ Three Year 1 segments. Note: the personas doc is **pre-alignment** — its SB 54
 - **Functional spec:**
   - **Input:** fault code (from B1/B2) + model (A3).
   - **Output:** plain-language explanation ("This usually means the drain can't clear — often a filter or a kinked hose") + a non-technical next step.
-  - **Rules:** WASM SQLite in-browser — exact-match lookup `0.07 µs`, FTS5 `4.2 µs` `[MEASUREMENT — benchmark harness required]`. Offline-first: lookup works with no network. No lookup result → "we couldn't match this code on-device" + conservative next step (never a fabricated explanation).
+  - **Rules:** WASM SQLite in-browser — offline-first exact-match + FTS5 lookup `[MEASUREMENT — benchmark harness required]`. Offline-first: lookup works with no network. No lookup result → "we couldn't match this code on-device" + conservative next step (never a fabricated explanation).
 - **Safety gating (#8):** If the code maps to a gas/240V/sealed-system class, the explainer **must not** suggest a DIY step and must surface B4.
 - **Data captured:** code + explanation served (on-device pack). No telemetry required to serve this.
 - **Monetization touchpoint:** None.
@@ -542,7 +542,7 @@ Three Year 1 segments. Note: the personas doc is **pre-alignment** — its SB 54
 
 - **Freeze definitions + denominators before the pilot.** The §8 inconsistency flag on FTFR (40–50% / 50–60% / 85–95%) is a **blocking open item**: a single authoritative baseline + denominator + CI is required before *any* external deck.
 - **$150/deflection** is reported as a *range with CI against a baseline*, never a bare number.
-- **PWA performance** (`<1.2 MB`, `<800 ms`, `0.07 µs`/`4.2 µs`) are `[MEASUREMENT]`s requiring a benchmark harness (device matrix, dataset, warm/cold, p50/p95/p99).
+- **PWA performance** (`<1.2 MB`, `<800 ms`) plus lookup latencies are `[MEASUREMENT]`s requiring a benchmark harness (device matrix, dataset, warm/cold, p50/p95/p99).
 
 ---
 

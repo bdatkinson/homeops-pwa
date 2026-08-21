@@ -60,7 +60,7 @@ HomeOps Year 1 is a **B2B2C wedge**: a zero-install, SMS-triggered Progressive W
 
 The previous React Native/Expo direction is **archived**. No React Native, no Expo, no app store, no ML Kit (ML Kit is an Android/iOS SDK, **not a browser API**). The browser surface is:
 
-- WASM SQLite in-browser (exact-match error-code lookup `0.07 µs`, FTS5 `4.2 µs` `[MEASUREMENT — benchmark harness with device/dataset/warm-cold/p50-p95-p99 required]`).
+- WASM SQLite in-browser (offline-first exact-match + FTS5 error-code lookup; performance to be measured — `[MEASUREMENT — benchmark harness with device/dataset/warm-cold/p50-p95-p99 required]`).
 - `<input capture="environment">` for camera OCR of model plates — **capability-detected**, not a universal dependency.
 - `webkitSpeechRecognition` for voice — **capability-detected**, sub-200 ms is an aspiration `[HYPOTHESIS]`, not a contract.
 - Offline-first: triage works in a basement/utility room with no connectivity; telemetry syncs on consent.
@@ -197,7 +197,7 @@ Three Year 1 segments. Note: the personas doc is **pre-alignment** — its SB 54
 - **Functional spec:**
   - **Input:** fault code (from B1/B2) + model (A3).
   - **Output:** plain-language explanation ("This usually means the drain can't clear — often a filter or a kinked hose") + a non-technical next step.
-  - **Rules:** WASM SQLite in-browser — exact-match lookup `0.07 µs`, FTS5 `4.2 µs` `[MEASUREMENT — benchmark harness required]`. Offline-first: lookup works with no network. No lookup result → "we couldn't match this code on-device" + conservative next step (never a fabricated explanation).
+  - **Rules:** WASM SQLite in-browser — offline-first exact-match + FTS5 lookup `[MEASUREMENT — benchmark harness required]`. Offline-first: lookup works with no network. No lookup result → "we couldn't match this code on-device" + conservative next step (never a fabricated explanation).
 - **Safety gating (#8):** If the code maps to a gas/240V/sealed-system class, the explainer **must not** suggest a DIY step and must surface B4.
 - **Data captured:** code + explanation served (on-device pack). No telemetry required to serve this.
 - **Monetization touchpoint:** None.
@@ -493,7 +493,7 @@ Three Year 1 segments. Note: the personas doc is **pre-alignment** — its SB 54
 
 - **Freeze definitions + denominators before the pilot.** The §8 inconsistency flag on FTFR (40–50% / 50–60% / 85–95%) is a **blocking open item**: a single authoritative baseline + denominator + CI is required before *any* external deck.
 - **$150/deflection** is reported as a *range with CI against a baseline*, never a bare number.
-- **PWA performance** (`<1.2 MB`, `<800 ms`, `0.07 µs`/`4.2 µs`) are `[MEASUREMENT]`s requiring a benchmark harness (device matrix, dataset, warm/cold, p50/p95/p99).
+- **PWA performance** (`<1.2 MB`, `<800 ms`) plus lookup latencies are `[MEASUREMENT]`s requiring a benchmark harness (device matrix, dataset, warm/cold, p50/p95/p99).
 
 ---
 
