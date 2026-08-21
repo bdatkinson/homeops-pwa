@@ -9,7 +9,8 @@ let initialized = false;
 let initAttempted = false;
 
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com";
+// US Cloud (EU override per user 2026-08-20 — P9's EU requirement dropped)
+const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
 /** Initialize PostHog — only if consent is granted and keys exist. */
 export function initAnalytics(): boolean {
