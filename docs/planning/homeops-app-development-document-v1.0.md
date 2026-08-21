@@ -452,7 +452,7 @@ Three Year 1 segments. Note: the personas doc is **pre-alignment** — its SB 54
 - **Functional spec:**
   - **Input:** aggregated (consented) deflection + dispatch + outcome data.
   - **Output:** a report: deflection rate, FTFR, $ saved per deflection — each with **denominator, baseline, and CI** `[TARGET/HYPOTHESIS — see §5]`. Every number classified; no unclassified number renders.
-  - **Rules:** report only *measured* figures; `$150 saved/deflection` is shown as a **pilot estimate with baseline + CI**, never a flat "we save you $150." The FTFR number must resolve the 40–50% / 50–60% / 85–95% inconsistency (single baseline + denominator) before any external claim.
+  - **Rules:** report only *measured* figures; `$150 saved/deflection` is shown as a **pilot estimate with baseline + CI**, never a flat "we save you $150." The FTFR number must use the verified baseline (appliance 68–74%, Exoserva 2026; industry avg 75–80%, Aberdeen/PTC/IBM) with a defined denominator before any external claim. [RESOLVED 2026-08-21 — see homeops-ftfr-deep-dossier-2026-08-21.md]
 - **Safety gating (#8):** None.
 - **Data captured:** aggregated, de-identified (not "anonymized" without a documented assessment) reporting rollups.
 - **Monetization touchpoint:** **Invoice rollup.** The $25/deflected dispatch line-items aggregate here; this report is the invoice backing.
@@ -540,7 +540,7 @@ Three Year 1 segments. Note: the personas doc is **pre-alignment** — its SB 54
 
 ### 5.1 Explicit measurement discipline (from GTM §8)
 
-- **Freeze definitions + denominators before the pilot.** The §8 inconsistency flag on FTFR (40–50% / 50–60% / 85–95%) is a **blocking open item**: a single authoritative baseline + denominator + CI is required before *any* external deck.
+- **Freeze definitions + denominators before the pilot.** The FTFR baseline is **RESOLVED (2026-08-21)**: appliance 68–74% (Exoserva), industry avg 75–80% (Aberdeen 2013/PTC 2024/IBM 2026), broken band 60–65% (UASA). Use `homeops-ftfr-deep-dossier-2026-08-21.md` + `homeops-adjacent-metrics-dossier-2026-08-21.md` — a single authoritative baseline + denominator + CI is still required before *any* external deck.
 - **$150/deflection** is reported as a *range with CI against a baseline*, never a bare number.
 - **PWA performance** (`<1.2 MB`, `<800 ms`) plus lookup latencies are `[MEASUREMENT]`s requiring a benchmark harness (device matrix, dataset, warm/cold, p50/p95/p99).
 
