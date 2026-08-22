@@ -4,6 +4,8 @@
 /.git/
 /node_modules/
 /.turbo/
+/apps/web/.next/
 **/node_modules/
 **/.turbo/
+**/.next/
 
