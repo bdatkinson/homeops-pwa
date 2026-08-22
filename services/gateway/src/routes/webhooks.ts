@@ -6,7 +6,7 @@
  *   → validates signature, normalizes, classifies against A1 rules,
  *     persists intake, fires tenant SMS with single-purpose 72h link.
  *
- * POST /api/v1/dev/simulate/property-meld   (mock mode only)
+ * POST /api/v1/webhooks/dev/simulate/property-meld   (mock mode only)
  *   Body: { fixture?: number, overrides?: Partial<WorkOrderEvent> }
  *   → posts a generated fixture through the SAME handler path, so the
  *     funnel is demoable and testable without the real sandbox (OQ-01).

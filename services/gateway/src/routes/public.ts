@@ -97,6 +97,97 @@ publicRouter.get("/passports/public/:token", async (c) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// GET /api/v1/intake/public/:token
+// Resolve a single-purpose A1 intake token (the link in the tenant SMS).
+// No auth — the token IS the credential. Returns only PII-safe fields
+// (never tenant phone/name). 410 when the 72h link has expired.
+// Used by the web app's /p/[token] Take Command landing (A2).
+// ─────────────────────────────────────────────────────────────────────────────
+publicRouter.get("/intake/public/:token", async (c) => {
+  const token = c.req.param("token");
+
+  const { data, error } = await supabase
+    .from("work_order_intake")
+    .select("id, category, appliance_type, title, description, created_at, token_expires_at, opened_at")
+    .eq("token", token)
+    .maybeSingle();
+
+  if (error || !data) {
+    return c.json({ error: "not_found", message: "Link not found" }, 404);
+  }
+  if (data.token_expires_at && new Date(data.token_expires_at) < new Date()) {
+    return c.json({ error: "expired", message: "This link has expired" }, 410);
+  }
+
+  return c.json({
+    intake_id: data.id,
+    category: data.category,
+    appliance_type: data.appliance_type,
+    title: data.title,
+    description: data.description,
+    created_at: data.created_at,
+    token_expires_at: data.token_expires_at,
+    opened_at: data.opened_at,
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/v1/intake/public/:token/diagnostic
+// Start a guest diagnostic session from the A2 landing — no sign-in, the
+// token is the auth. Creates a diagnostic_sessions row linked to the intake
+// and stamps opened_at / diagnostic_session_id on the intake for funnel
+// traceability. Idempotent: a second call returns the existing session.
+// ─────────────────────────────────────────────────────────────────────────────
+publicRouter.post("/intake/public/:token/diagnostic", async (c) => {
+  const token = c.req.param("token");
+
+  const { data: intake, error: intakeErr } = await supabase
+    .from("work_order_intake")
+    .select("id, title, token_expires_at, opened_at, diagnostic_session_id")
+    .eq("token", token)
+    .maybeSingle();
+
+  if (intakeErr || !intake) {
+    return c.json({ error: "not_found", message: "Link not found" }, 404);
+  }
+  if (intake.token_expires_at && new Date(intake.token_expires_at) < new Date()) {
+    return c.json({ error: "expired", message: "This link has expired" }, 410);
+  }
+  if (intake.diagnostic_session_id) {
+    return c.json({
+      intake_id: intake.id,
+      session_id: intake.diagnostic_session_id,
+      already_started: true,
+    });
+  }
+
+  const { data: session, error: sessErr } = await supabase
+    .from("diagnostic_sessions")
+    .insert({
+      user_id: null, // guest — the intake token is the credential
+      intake_id: intake.id,
+      symptom: intake.title ?? "Appliance issue",
+    })
+    .select("id")
+    .single();
+
+  if (sessErr || !session) {
+    console.error("[intake/public] diagnostic session create failed:", sessErr?.message);
+    return c.json({ error: "db_error", message: "Could not start diagnostic" }, 500);
+  }
+
+  await supabase
+    .from("work_order_intake")
+    .update({ opened_at: new Date().toISOString(), diagnostic_session_id: session.id })
+    .eq("id", intake.id);
+
+  return c.json(
+    { intake_id: intake.id, session_id: session.id, already_started: false },
+    201
+  );
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // POST /api/v1/invites/claim
 // Unauthenticated — validates invite token, sends magic link to email
 // ─────────────────────────────────────────────────────────────────────────────

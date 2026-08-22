@@ -127,8 +127,14 @@ export function signReceipt(input: Omit<DiagnosticReceipt, "manifest_hash" | "si
   return { ...manifest, manifest_hash: manifestHash, signature, key_id: keyId } as DiagnosticReceipt;
 }
 
-/** Verify a receipt's signature + manifest integrity. Returns true when authentic. */
-export function verifyReceipt(receipt: DiagnosticReceipt): boolean {
+/**
+ * Verify a receipt's signature + manifest integrity. Returns true when authentic.
+ *
+ * `publicKey` (optional): base64 DER SPKI of the Ed25519 public key for the
+ * receipt's key_id — the production path (from the pubkey registry). When
+ * omitted, falls back to the local dev key file (dev/tests).
+ */
+export function verifyReceipt(receipt: DiagnosticReceipt, publicKey?: string | null): boolean {
   const { manifest_hash, signature, key_id } = receipt;
   const manifest = {
     receipt_id: receipt.receipt_id,
@@ -145,13 +151,19 @@ export function verifyReceipt(receipt: DiagnosticReceipt): boolean {
   const manifestBytes = Buffer.from(canonicalJson(manifest), "utf8");
   if (createHash("sha256").update(manifestBytes).digest("hex") !== manifest_hash) return false;
 
-  // Dev: recover the public key from the key file (production: pubkey registry)
-  const fs = require("node:fs");
-  const os = require("node:os");
-  const path = require("node:path");
-  const keyPath = path.join(os.homedir(), ".hermes", "homeops-receipt-signing.key");
-  if (!fs.existsSync(keyPath)) return false;
-  const priv = createPrivateKey({ key: fs.readFileSync(keyPath), format: "der", type: "pkcs8" });
-  const pub = createPublicKey(priv);
+  let pub: ReturnType<typeof createPublicKey>;
+  if (publicKey) {
+    // Registry path: explicit public key (base64 DER SPKI)
+    pub = createPublicKey({ key: Buffer.from(publicKey, "base64"), format: "der", type: "spki" });
+  } else {
+    // Dev path: recover the public key from the local key file
+    const fs = require("node:fs");
+    const os = require("node:os");
+    const path = require("node:path");
+    const keyPath = path.join(os.homedir(), ".hermes", "homeops-receipt-signing.key");
+    if (!fs.existsSync(keyPath)) return false;
+    const priv = createPrivateKey({ key: fs.readFileSync(keyPath), format: "der", type: "pkcs8" });
+    pub = createPublicKey(priv);
+  }
   return verify(null, manifestBytes, pub, Buffer.from(signature, "hex"));
 }

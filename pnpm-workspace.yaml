@@ -4,7 +4,7 @@ packages:
   - "services/*"
 allowBuilds:
   bun: true
-  core-js: set this to true or false
+  core-js: true
   detox: true
   dtrace-provider: true
   sharp: true

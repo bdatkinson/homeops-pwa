@@ -49,4 +49,30 @@ describe("diagnostic receipt signing", () => {
     // created_at is fixed in input, so manifests are identical → same signature
     expect(a.signature).toBe(b.signature);
   });
+
+  it("verifies with an explicit registry public key (SPKI base64)", () => {
+    const fs = require("node:fs");
+    const os = require("node:os");
+    const path = require("node:path");
+    const { createPrivateKey, createPublicKey } = require("node:crypto");
+    const keyPath = path.join(os.homedir(), ".hermes", "homeops-receipt-signing.key");
+    const priv = createPrivateKey({ key: fs.readFileSync(keyPath), format: "der", type: "pkcs8" });
+    const pubB64 = createPublicKey(priv).export({ type: "spki", format: "der" }).toString("base64");
+
+    const r = signReceipt(baseInput);
+    expect(verifyReceipt(r, pubB64)).toBe(true);
+
+    // Tampering still caught with the explicit key
+    const tampered = { ...r, state_history: ["opened", "HACKED"] };
+    expect(verifyReceipt(tampered as any, pubB64)).toBe(false);
+  });
+
+  it("rejects a receipt verified against the wrong public key", () => {
+    const { generateKeyPairSync } = require("node:crypto");
+    const { publicKey } = generateKeyPairSync("ed25519");
+    const wrongB64 = publicKey.export({ type: "spki", format: "der" }).toString("base64");
+
+    const r = signReceipt(baseInput);
+    expect(verifyReceipt(r, wrongB64)).toBe(false);
+  });
 });
