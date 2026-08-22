@@ -9,6 +9,7 @@ import { propertiesRouter } from "./routes/properties.js";
 import { consumerRouter } from "./routes/consumer.js";
 import { appliancesRouter } from "./routes/appliances.js";
 import { publicRouter } from "./routes/public.js";
+import { safetyRouter } from "./routes/safety.js";
 import { requireAuth, requireRole } from "./middleware/auth.js";
 
 const app = new Hono();
@@ -60,6 +61,7 @@ app.route("/api/v1/appliances", appliancesRouter);
 app.route("/api/v1/passports", passportsRouter);
 app.route("/api/v1/passports", invitesRouter);
 app.route("/api/v1/consumer", consumerRouter);
+app.route("/api/v1/safety", safetyRouter);
 app.route("/api/v1", publicRouter);
 app.get("/api/v1/me", requireAuth, async (c) => {
   const userId = c.get("userId");
