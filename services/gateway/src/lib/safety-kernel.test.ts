@@ -11,6 +11,7 @@ import {
   evaluateCase,
   HARD_EXCLUSIONS,
   isEmergencyStop,
+  isInsufficientEvidence,
   mostRestrictive,
 } from "./safety-kernel";
 
@@ -107,15 +108,24 @@ describe("signal lexicon", () => {
 });
 
 describe("appliance floor defaults", () => {
-  it("unknown symptom on a washer defaults to CONSUMER_ROUTINE floor", () => {
+  it("vague symptom on a washer SUSPENDS with INSUFFICIENT_EVIDENCE", () => {
     const r = evaluateCase({
       applianceType: "washer",
       signals: ["odd noise"],
       exclusions: [],
     });
-    expect(DISPOSITION_ORDER[r.disposition]).toBeGreaterThanOrEqual(
-      DISPOSITION_ORDER.CONSUMER_ROUTINE
-    );
+    expect(r.disposition).toBe("INSUFFICIENT_EVIDENCE");
+    expect(r.requiredChecks).toContain("gather_model_plate_photo");
+    expect(r.requiredChecks).toContain("gather_symptom_detail");
+  });
+
+  it("no signals at all → INSUFFICIENT_EVIDENCE (cannot route safely)", () => {
+    const r = evaluateCase({
+      applianceType: "refrigerator",
+      signals: [],
+      exclusions: [],
+    });
+    expect(r.disposition).toBe("INSUFFICIENT_EVIDENCE");
   });
 
   it("water heater floor is CONSUMER_CONDITIONAL (never routine)", () => {
@@ -133,6 +143,7 @@ describe("interaction helpers", () => {
     expect(allowsConsumerAction("CONSUMER_ROUTINE")).toBe(true);
     expect(allowsConsumerAction("CONSUMER_CONDITIONAL")).toBe(true);
     expect(allowsConsumerAction("OBSERVATION_ONLY")).toBe(false);
+    expect(allowsConsumerAction("INSUFFICIENT_EVIDENCE")).toBe(false);
     expect(allowsConsumerAction("PROFESSIONAL_REQUIRED")).toBe(false);
     expect(allowsConsumerAction("EMERGENCY_STOP")).toBe(false);
   });
@@ -140,6 +151,11 @@ describe("interaction helpers", () => {
   it("EMERGENCY_STOP is always absolute", () => {
     expect(isEmergencyStop("EMERGENCY_STOP")).toBe(true);
     expect(isEmergencyStop("PROFESSIONAL_REQUIRED")).toBe(false);
+  });
+
+  it("INSUFFICIENT_EVIDENCE is identifiable by the triage loop", () => {
+    expect(isInsufficientEvidence("INSUFFICIENT_EVIDENCE")).toBe(true);
+    expect(isInsufficientEvidence("CONSUMER_ROUTINE")).toBe(false);
   });
 });
 

@@ -11,20 +11,25 @@
  */
 
 // ---------------------------------------------------------------------------
-// 1. The 5 Case Dispositions (GTM Rev 4.1 — replaces static L1/L2/L3)
+// 1. The Case Dispositions (GTM Rev 4.1 + Conversion Plan §Eligibility)
+//    Six dispositions: five severity tiers + the plan's suspension state.
 // ---------------------------------------------------------------------------
 
 export const DISPOSITIONS = [
-  "OBSERVATION_ONLY",      // inspect, listen, scan model plate, photograph — no physical manipulation
-  "CONSUMER_ROUTINE",      // low-risk, fully reversible maintenance (control lock reset, external filter wash)
-  "CONSUMER_CONDITIONAL",  // safe only after explicit prerequisite checks pass (washer pump drain w/ containment)
-  "PROFESSIONAL_REQUIRED", // specialized competence, tools, high voltage, or sealed systems
-  "EMERGENCY_STOP",        // immediate acute risk — gas smell, arcing, thermal runaway, flood, active CPSC recall
+  "INSUFFICIENT_EVIDENCE",   // SUSPENSION: cannot route yet — gather observations first
+  "OBSERVATION_ONLY",        // inspect, listen, scan model plate, photograph — no physical manipulation
+  "CONSUMER_ROUTINE",        // low-risk, fully reversible maintenance (control lock reset, external filter wash)
+  "CONSUMER_CONDITIONAL",    // safe only after explicit prerequisite checks pass (washer pump drain w/ containment)
+  "PROFESSIONAL_REQUIRED",   // specialized competence, tools, high voltage, or sealed systems
+  "EMERGENCY_STOP",          // immediate acute risk — gas smell, arcing, thermal runaway, flood, active CPSC recall
 ] as const;
 
 export type Disposition = (typeof DISPOSITIONS)[number];
 
 export const DISPOSITION_ORDER: Record<Disposition, number> = {
+  // INSUFFICIENT_EVIDENCE sits BELOW every severity tier: it is never the
+  // most-restrictive winner when any real signal or exclusion matched.
+  INSUFFICIENT_EVIDENCE: -1,
   OBSERVATION_ONLY: 0,
   CONSUMER_ROUTINE: 1,
   CONSUMER_CONDITIONAL: 2,
@@ -161,7 +166,22 @@ export function evaluateCase(input: SafetyInput): {
   const floor = APPLIANCE_DEFAULTS[input.applianceType.toLowerCase()];
   if (floor) dispositions.push(floor);
 
-  // 4. Most restrictive wins
+  // 4. Most restrictive wins.
+  //    BUT: if nothing informative matched (no exclusions, no signal rule),
+  //    we cannot route safely — SUSPEND with INSUFFICIENT_EVIDENCE (the plan's
+  //    5th disposition). The triage loop must gather observations (model plate
+  //    photo, symptom detail) before any state transition. The appliance floor
+  //    alone is never enough to authorize an action on a vague symptom.
+  const hasExclusion = input.exclusions.length > 0;
+  const hasSignalMatch = matchedSignals.length > 0;
+  if (!hasExclusion && !hasSignalMatch) {
+    return {
+      disposition: "INSUFFICIENT_EVIDENCE",
+      requiredChecks: ["gather_model_plate_photo", "gather_symptom_detail"],
+      matchedSignals,
+    };
+  }
+
   return {
     disposition: mostRestrictive(dispositions),
     requiredChecks: [...requiredChecks],
@@ -177,4 +197,10 @@ export function allowsConsumerAction(d: Disposition): boolean {
 /** EMERGENCY_STOP is always absolute — no checks, no action, immediate halt. */
 export function isEmergencyStop(d: Disposition): boolean {
   return d === "EMERGENCY_STOP";
+}
+
+/** INSUFFICIENT_EVIDENCE: traversal suspended — the triage loop must gather
+ *  more observations before any state transition (Conversion Plan §Eligibility). */
+export function isInsufficientEvidence(d: Disposition): boolean {
+  return d === "INSUFFICIENT_EVIDENCE";
 }
