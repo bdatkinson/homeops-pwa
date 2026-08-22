@@ -1,6 +1,6 @@
 -- ============================================================
 -- HomeOps — Migration: guest diagnostics + intake traceability (A2)
--- The A2 PWA landing (https://homeoperator.app/p/<token>) lets a tenant
+-- The A2 PWA landing (https://www.homeops.biz/p/<token>) lets a tenant
 -- start a diagnostic with NO sign-in — the single-purpose intake token
 -- IS the auth. That means diagnostic sessions can now be created without
 -- a user_id, and they must link back to the A1 intake row so the funnel

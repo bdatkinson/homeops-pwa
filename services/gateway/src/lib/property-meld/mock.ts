@@ -12,10 +12,13 @@
 
 import type {
   PropertyMeldWorkOrderEvent,
+  PropertyMeldMeldEvent,
   PropertyMeldEventType,
   WorkOrderIntake,
+  HomeOpsEventType,
+  PmDirectorySync,
 } from "./types.js";
-import { APPLIANCE_CATEGORIES } from "./types.js";
+import { APPLIANCE_CATEGORIES, toHomeOpsEventType } from "./types.js";
 
 /** Client interface the A1 handler depends on. */
 export interface PropertyMeldClient {
@@ -27,11 +30,20 @@ export interface PropertyMeldClient {
   normalizeEvent(raw: unknown): WorkOrderIntake;
 }
 
-/** Derive the normalized intake from a raw Property Meld event. */
+/**
+ * Derive the normalized intake from a raw Property Meld event.
+ * Tolerant of TWO shapes:
+ *  A) flat contract shape (work_order_id / property_id / primary_contact)
+ *  B) nested meld shape — meld + resident + property + unit objects using
+ *     the documented PMS field names (likely the REAL payload)
+ */
 export function normalizeEvent(raw: unknown): WorkOrderIntake {
+  const hasMeld = typeof raw === "object" && raw !== null && "meld" in (raw as object);
+  if (hasMeld) {
+    return normalizeMeldEvent(raw as PropertyMeldMeldEvent);
+  }
   const e = raw as Partial<PropertyMeldWorkOrderEvent>;
-  const eventType: PropertyMeldEventType =
-    e.event === "work_order.updated" ? "work_order.updated" : "work_order.created";
+  const eventType: HomeOpsEventType = toHomeOpsEventType(e.event);
   const tenantPhone =
     e.tenant_phone?.trim() || e.primary_contact?.phone?.trim() || null;
   const tenantName = e.primary_contact?.name?.trim() || null;
@@ -48,6 +60,30 @@ export function normalizeEvent(raw: unknown): WorkOrderIntake {
     tenant_phone: tenantPhone,
     appliance_type: e.appliance_type?.trim() || null,
     event_type: eventType,
+    received_at: new Date().toISOString(),
+  };
+}
+
+/** Normalize the nested meld shape into the intake model. */
+function normalizeMeldEvent(e: PropertyMeldMeldEvent): WorkOrderIntake {
+  const meld = e.meld ?? {};
+  const resident = e.resident ?? {};
+  const property = e.property ?? {};
+  const unit = e.unit ?? {};
+  const fullName = [resident.first_name, resident.last_name].filter(Boolean).join(" ").trim();
+
+  return {
+    provider: "property_meld",
+    work_order_id: String(meld.id ?? ""),
+    property_id: String(property.pm_property_id ?? property.address_line_1 ?? ""),
+    unit_id: String(unit.pm_unit_id ?? unit.unit_number ?? ""),
+    category: String(meld.category ?? ""),
+    title: String(meld.title ?? ""),
+    description: meld.description?.trim() || null,
+    tenant_name: fullName || null,
+    tenant_phone: resident.phone?.trim() || null,
+    appliance_type: null, // resolved later via the unit registry (E4)
+    event_type: toHomeOpsEventType(e.event),
     received_at: new Date().toISOString(),
   };
 }
@@ -77,12 +113,148 @@ export function fixtureWorkOrderCreated(overrides: Partial<PropertyMeldWorkOrder
     description: "Water standing at the bottom after every cycle.",
     primary_contact: {
       name: "Jordan Tenant",
-      phone: "+15551234567",
+      phone: "+15550111001",
       email: "jordan@example.com",
     },
     created_at: new Date().toISOString(),
   };
   return { ...base, ...overrides };
+}
+
+/**
+ * Fixture for the LIKELY REAL Property Meld shape: a meld event carrying
+ * nested resident / property / unit objects with the documented field names.
+ */
+export function fixtureMeldCreated(overrides: Partial<PropertyMeldMeldEvent> = {}): PropertyMeldMeldEvent {
+  const base: PropertyMeldMeldEvent = {
+    event: "meld.created",
+    meld: {
+      id: `MELD-${Math.floor(100000 + Math.random() * 899999)}`,
+      category: "appliance",
+      title: "Dryer not heating",
+      description: "Clothes come out cold after a full cycle.",
+      created_at: new Date().toISOString(),
+    },
+    resident: {
+      pm_resident_id: "res_901",
+      first_name: "Jordan",
+      last_name: "Tenant",
+      email: "jordan@example.com",
+      phone: "+15550111001",
+      status: "active",
+    },
+    property: {
+      pm_property_id: "prop_001",
+      address_line_1: "2210 Maple St",
+      city: "Lexington",
+      state: "KY",
+      zip: "40507",
+    },
+    unit: {
+      pm_unit_id: "unit_042",
+      pm_property_id: "prop_001",
+      unit_number: "42",
+    },
+  };
+  return { ...base, ...overrides };
+}
+
+/** Fixture for the inbound 4-hour directory sync (documented schema). */
+export function fixtureDirectorySync(overrides: Partial<PmDirectorySync> = {}): PmDirectorySync {
+  const base: PmDirectorySync = {
+    event: "directory.sync",
+    synced_at: new Date().toISOString(),
+    properties: [
+      {
+        pm_property_id: "prop_001",
+        address_line_1: "2210 Maple St",
+        city: "Lexington",
+        state: "KY",
+        zip: "40507",
+        year_built: 2004,
+        maintenance_limit: 500,
+        property_maintenance_notes: "HOA approval required for exterior work.",
+        property_groups: ["Maple Portfolio"],
+      },
+      {
+        pm_property_id: "prop_002",
+        address_line_1: "88 Oak Ave",
+        city: "Lexington",
+        state: "KY",
+        zip: "40502",
+        year_built: 1998,
+        maintenance_limit: 350,
+        property_groups: [],
+      },
+    ],
+    units: [
+      {
+        pm_unit_id: "unit_042",
+        pm_property_id: "prop_001",
+        unit_number: "42",
+        address_line_1: "2210 Maple St",
+        city: "Lexington",
+        state: "KY",
+        zip: "40507",
+      },
+      {
+        pm_unit_id: "unit_101",
+        pm_property_id: "prop_002",
+        unit_number: "101",
+        address_line_1: "88 Oak Ave",
+        city: "Lexington",
+        state: "KY",
+        zip: "40502",
+      },
+    ],
+    residents: [
+      {
+        pm_resident_id: "res_901",
+        pm_property_id: "prop_001",
+        pm_unit_id: "unit_042",
+        first_name: "Jordan",
+        last_name: "Tenant",
+        email: "jordan@example.com",
+        phone: "+15550111001",
+        status: "active",
+      },
+      {
+        pm_resident_id: "res_902",
+        pm_property_id: "prop_002",
+        pm_unit_id: "unit_101",
+        first_name: "Alex",
+        last_name: "Renter",
+        email: "alex@example.com",
+        phone: "+15550111002",
+        status: "future",
+      },
+    ],
+    owners: [
+      {
+        pm_owner_id: "own_007",
+        first_name: "Pat",
+        last_name: "Owner",
+        email: "pat@example.com",
+        phone: "+15550111007",
+        associated_properties: ["prop_001", "prop_002"],
+      },
+    ],
+  };
+  return { ...base, ...overrides };
+}
+
+/** Fixture for the outbound invoice-approved event (financial object). */
+export function fixtureInvoiceApproved(overrides: Record<string, unknown> = {}) {
+  return {
+    event: "invoice.approved",
+    invoice_id: "INV-2026-0001",
+    vendor_id: "ven_311",
+    meld_id: "MELD-100123",
+    amount: 214.5,
+    description: "Replaced dishwasher drain pump",
+    attachment_url: "https://pm.example.com/invoices/INV-2026-0001.pdf",
+    ...overrides,
+  };
 }
 
 /** Fixtures for exercising every branch of the A1 filter. */

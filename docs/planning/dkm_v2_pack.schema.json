@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.homeops.biz/schemas/dkm_v2_pack.schema.json",
+  "title": "HomeOps Diagnostic Pack (DKM-v2)",
+  "description": "Validated, signed DKM-v2 execution contract for one appliance family. Compiled from corpus facts only (clean-room rule: raw manual prose is never emitted), signed by the pack server (Ed25519), and verified on-device before use. Schema mirrors dkm_v2_schema.sql (dkm_packages) and the dkm_compiler.py output contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "pack_id",
+    "schema_version",
+    "model_patterns",
+    "exceptions",
+    "region",
+    "facts",
+    "procedure_nodes",
+    "rights",
+    "integrity"
+  ],
+  "properties": {
+    "pack_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)+-v[0-9]+$",
+      "description": "Canonical identifier: {make}-{appliance-type}-v{rev}. Example: hisense-refrigerator-v1"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "description": "DKM contract schema version. 2.0 = current (matches dkm_v2_schema.sql)."
+    },
+    "model_patterns": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Wildcard model-number patterns the pack applies to. '*' = family-wide."
+    },
+    "exceptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Explicit model exclusions (models that look like the pattern but must NOT use this pack)."
+    },
+    "region": {
+      "type": "string",
+      "minLength": 2,
+      "description": "Market region the pack is valid for. 'US' = US market."
+    },
+    "facts": {
+      "type": "array",
+      "description": "Fact-only knowledge: error aliases, test tolerances, part numbers. No prose.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "value"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["error_alias", "test_tolerance", "part_number", "test_point"],
+            "description": "Fact class. error_alias = error code / fault alias; test_tolerance = expected value with unit; part_number = OEM part reference."
+          },
+          "value": { "type": "string", "minLength": 1, "description": "The fact value (code, tolerance, part ref)." },
+          "unit": { "type": "string", "description": "Unit for tolerances. Example: ohm, vac, psi." },
+          "model_scope": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Models this fact applies to. Omitted = family-wide."
+          },
+          "source": {
+            "type": "string",
+            "description": "Source locator: doc title fragment or page ref. Example: 'Troubleshooting p21'."
+          }
+        }
+      }
+    },
+    "procedure_nodes": {
+      "type": "array",
+      "description": "Deterministic step sequence (facts-only step titles; kernel gates actual actions).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "action_class"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^step-[0-9]{3}$",
+            "description": "Stable node id within the pack. Example: step-001."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 2,
+            "description": "Step title (fact-level, no raw prose). Example: 'Water inlet filter check'."
+          },
+          "action_class": {
+            "type": "string",
+            "enum": ["observe", "test", "service", "replace", "stop"],
+            "description": "Kernel-facing action class. Compiler default: observe. The safety kernel maps these to dispositions; never the LLM."
+          },
+          "evidence_preconditions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Observations/measurements required before this node executes."
+          },
+          "on_pass": { "type": ["string", "null"], "description": "Next node id or terminal action when the check passes." },
+          "on_fail": { "type": ["string", "null"], "description": "Next node id or terminal action when the check fails. Example: 'STOP: level 3 — call a pro'." }
+        }
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources", "prose_discarded", "compiled_by", "compiled_at"],
+      "description": "Provenance block: source locators + clean-room basis (OQ-02 posture lives here, never stripped).",
+      "properties": {
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_identity", "title", "rights_basis"],
+            "properties": {
+              "source_identity": {
+                "type": "string",
+                "description": "SHA-256 prefix of the source document (first 16 hex chars)."
+              },
+              "title": { "type": "string", "description": "Source document title (corpus filename)." },
+              "rights_basis": {
+                "type": "string",
+                "description": "OQ-02 posture tag. Example: 'clean_room_facts'."
+              }
+            }
+          }
+        },
+        "prose_discarded": {
+          "const": true,
+          "description": "Clean-room firebreak: raw manual prose is never emitted into a DKM contract."
+        },
+        "compiled_by": { "type": "string", "description": "Compiler identity. Example: 'dkm_compiler.py v2'." },
+        "compiled_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+          "description": "Compile timestamp, UTC ISO-8601."
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_hash", "signature", "key_id", "rollback_floor", "revocation_uri"],
+      "description": "Tamper-evidence: manifest hash + Ed25519 signature. Verified on-device before any OTA swap; a tampered pack fails closed.",
+      "properties": {
+        "manifest_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 hex over the canonical JSON serialization of the manifest (all fields except integrity)."
+        },
+        "signature": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$",
+          "description": "Ed25519 signature over the manifest bytes (hex, 64 bytes)."
+        },
+        "key_id": {
+          "type": "string",
+          "description": "Signing key identifier. Example: 'dkm-signing-v1'."
+        },
+        "rollback_floor": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+$",
+          "description": "Minimum schema_version a client must accept; guards downgrade attacks."
+        },
+        "revocation_uri": {
+          "type": "string",
+          "description": "URI to check key/pack revocation. Empty string = none published."
+        }
+      }
+    }
+  }
+}

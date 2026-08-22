@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const GATEWAY = "https://homeoperator-gateway.fly.dev";
+const GATEWAY = process.env.NEXT_PUBLIC_GATEWAY_URL ?? "https://homeops-gateway.fly.dev";
 
 export default function ActivatePage({
   params,

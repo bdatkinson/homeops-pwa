@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from "bun:test";
 import { classifyIntake, generateIntakeToken, buildSmsBody, buildIntakeLink, INTAKE_TOKEN_TTL_HOURS } from "./intake";
-import { normalizeEvent, fixtureWorkOrderCreated, fixtureEvents } from "./mock";
+import { normalizeEvent, fixtureWorkOrderCreated, fixtureMeldCreated, fixtureEvents } from "./mock";
 import { isApplianceCategory } from "./mock";
 
 describe("A1 classification (appliance category filter)", () => {
@@ -91,11 +91,11 @@ describe("intake token (A1 rule 4 — no PII in URL)", () => {
 describe("SMS body + link", () => {
   it("builds the A1 SMS with appliance label", () => {
     const intake = normalizeEvent(fixtureWorkOrderCreated({ appliance_type: "dishwasher" }));
-    const link = buildIntakeLink("https://homeoperator.app", "tok123");
+    const link = buildIntakeLink("https://www.homeops.biz", "tok123");
     const body = buildSmsBody(intake, link);
     expect(body).toContain("Take Command: your dishwasher issue is queued.");
     expect(body).toContain("no download");
-    expect(body).toContain("https://homeoperator.app/p/tok123");
+    expect(body).toContain("https://www.homeops.biz/p/tok123");
     expect(body).toContain("Reply STOP to opt out.");
   });
 
@@ -107,6 +107,37 @@ describe("SMS body + link", () => {
   });
 
   it("normalizes trailing slash on base URL", () => {
-    expect(buildIntakeLink("https://homeoperator.app/", "t")).toBe("https://homeoperator.app/p/t");
+    expect(buildIntakeLink("https://www.homeops.biz/", "t")).toBe("https://www.homeops.biz/p/t");
+  });
+});
+
+describe("Nested meld shape (documented PM schema, 2026-08-22)", () => {
+  it("maps meld.created → work_order.created and extracts nested resident", () => {
+    const intake = normalizeEvent(fixtureMeldCreated());
+    expect(intake.event_type).toBe("work_order.created");
+    expect(intake.work_order_id).toMatch(/^MELD-/);
+    expect(intake.tenant_name).toBe("Jordan Tenant");
+    expect(intake.tenant_phone).toBe("+15550111001");
+    expect(intake.property_id).toBe("prop_001");
+    expect(intake.unit_id).toBe("unit_042");
+    expect(intake.category).toBe("appliance");
+  });
+
+  it("maps meld.updated → work_order.updated", () => {
+    const intake = normalizeEvent(fixtureMeldCreated({ event: "meld.updated" }));
+    expect(intake.event_type).toBe("work_order.updated");
+    expect(classifyIntake(intake).eligible).toBe(false);
+  });
+
+  it("is eligible through the A1 filter when resident has a phone", () => {
+    const intake = normalizeEvent(fixtureMeldCreated());
+    expect(classifyIntake(intake).eligible).toBe(true);
+  });
+
+  it("falls back to unit_number when pm_unit_id is missing", () => {
+    const intake = normalizeEvent(
+      fixtureMeldCreated({ unit: { unit_number: "42" } } as never)
+    );
+    expect(intake.unit_id).toBe("42");
   });
 });

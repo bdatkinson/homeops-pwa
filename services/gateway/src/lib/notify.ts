@@ -9,8 +9,11 @@ const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_FROM_NUMBER = process.env.TWILIO_FROM_NUMBER;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const RESEND_FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS ?? "admin@homeoperator.app";
-const APP_URL = process.env.APP_URL ?? "https://homeoperator.app";
+const RESEND_FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS ?? "admin@homeops.biz";
+const APP_URL = process.env.APP_URL ?? "https://www.homeops.biz";
+const STATUS_CALLBACK_URL =
+  process.env.STATUS_CALLBACK_URL ??
+  "https://homeops-gateway.fly.dev/api/v1/webhooks/twilio/status";
 
 export interface SmsResult {
   sid: string;
@@ -44,6 +47,9 @@ export async function sendInviteSms(
     To: toPhone.startsWith("+") ? toPhone : `+1${toPhone.replace(/\D/g, "")}`,
     From: TWILIO_FROM_NUMBER,
     Body: body,
+    // Status callbacks → gateway so delivery/failure lands in Supabase.
+    StatusCallback: STATUS_CALLBACK_URL,
+    StatusCallbackEvent: "sent,delivered,failed,undelivered",
   });
 
   const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
@@ -188,7 +194,7 @@ function buildInviteEmailHtml(opts: {
         <!-- Footer -->
         <tr><td style="background:#f9f9f7;padding:20px 40px;border-top:1px solid #eeeeee;">
           <p style="margin:0;font-size:12px;color:#999;">
-            Sent via HomeOps · <a href="${APP_URL}" style="color:#999;">homeoperator.app</a><br>
+            Sent via HomeOps · <a href="${APP_URL}" style="color:#999;">www.homeops.biz</a><br>
             You received this because your agent shared an appliance passport with you.
           </p>
         </td></tr>

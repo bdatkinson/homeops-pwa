@@ -17,8 +17,8 @@ import { requireAuth, requireRole } from "./middleware/auth.js";
 const app = new Hono();
 
 const allowedOrigins = [
-  "https://homeops.app",
-  "https://www.homeops.app",
+  "https://homeops.biz",
+  "https://www.homeops.biz",
   "http://localhost:3000",
   "http://localhost:8081",
 ];
